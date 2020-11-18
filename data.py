@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def load_heirarchy(fname):
+def load_hierarchy(fname):
     names = np.loadtxt(fname, delimiter='\t', skiprows=1, dtype=str, usecols=0)
     names = remove_comments(names[np.newaxis])[0]
     name_dict = {"Mr. Samuel Pepys Esq.": "Samuel Pepys",

@@ -3,7 +3,7 @@ import graph
 import plot
 
 
-hierarchy = data.load_heirarchy("data/Hierarchy.tsv")
+hierarchy = data.load_hierarchy("data/Hierarchy.tsv")
 letter_sets = ["data/BeinekieRecordLetters.tsv",
                "data/BeinekieRecordLetters2.tsv"]
 for letter_set in letter_sets:
