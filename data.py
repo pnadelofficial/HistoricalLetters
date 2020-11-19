@@ -28,14 +28,33 @@ def load_letters(fname):
                      "Willam Legge": "William Legge"}
     elif fname == "data/BeinekieRecordLetters2.tsv":
         name_dict = {"The Prince of Orange": "Prince of Orange",
-                     "John Lord Berkeley, commander of the Montaigne and others": "Lord Berkeley"}
+                     "John Lord Berkeley, commander of the Montaigne and others": "Lord Berkeley",
+                     "Mr. Frowd": "Phillip Frowd",
+                     "Phil. Frowd Esq., then to Pepys": ["Phillip Frowd", "Samuel Pepys"],
+                     "King James II, witnessed by Pepys": ["King James II", "Samuel Pepys"]}
     letters = map_values(letters, name_dict)
     return letters
 
 
 def map_values(str_array, str_dict):
     for bad_str, new_str in str_dict.items():
-        str_array[str_array == bad_str] = new_str
+        # replace row in place
+        if type(new_str) is str:
+            str_array[str_array == bad_str] = new_str
+        # replace row in place and append additional rows
+        elif type(new_str) is list:
+            # iterate over rows with bad_str
+            for row_index in np.argwhere(np.any(str_array == bad_str, axis=1)):
+                row = str_array[row_index]
+                row_replace = row == bad_str
+                for i in range(len(new_str)):
+                    row[row_replace] = new_str[i]
+                    # in place replacement
+                    if i == 0:
+                        str_array[row_index] = row
+                    # appending additional rows
+                    else:
+                        str_array = np.append(str_array, row[:np.newaxis], axis=0)
     return str_array
 
 
