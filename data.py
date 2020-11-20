@@ -17,7 +17,7 @@ def load_hierarchy(fname):
                  "Richars Carter": "Richard Carter"}
     # append title to all of the lords
     lords = ["Dartmouth", "Preston", "Berkeley", "Dover", "Newport", "Pembroke", "Dorset",
-             "Thanet", "Supese", "Mulgrave", "Carlisle", "Burlington", "Alesbury", "Weymouth",
+             "Thanet", "Supese", "Mulgrave", "Carlisle", "Burlington", "Aylesbury", "Weymouth",
              "Chandos", "Naughan-Carbury", "Crewe", "Opulstone", "North & Grey"]
     for lord in lords:
         name_dict[lord] = "Lord " + lord
@@ -45,6 +45,7 @@ def load_letters(fname):
                      "Captain Cornwall": "William Cornwall",
                      "Wiliam Cornwall": "William Cornwall",
                      "Captain Aylmer": "M. Aylmer",
+                     "Lord Alesbury": "Lord Aylesbury",
                      "Phil. Frowd Esq., then to Pepys": ["Phillip Frowd", "Samuel Pepys"],
                      "King James II, witnessed by Pepys": ["King James II", "Samuel Pepys"]}
         # break up csv in specified columns
