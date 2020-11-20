@@ -13,5 +13,8 @@ for letter_set in letter_sets:
     for node in to_from_graph.nodes:
         if node not in hierarchy:
             print(node)
+            to_from_graph.nodes[node]["rank"] = 10
+        else:
+            to_from_graph.nodes[node]["rank"] = hierarchy[node]
     print("\n")
     plot.draw_planar(to_from_graph)
