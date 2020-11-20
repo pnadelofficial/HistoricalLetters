@@ -55,7 +55,6 @@ def load_letters(fname):
                 if "," in letters[i, j] and letters[i, j] not in name_dict:
                     bad_str = letters[i, j]
                     new_str = np.asarray([substr.strip() for substr in bad_str.split(",")])
-                    # TODO test
                     name_dict[bad_str] = list(map_values(new_str[:, np.newaxis], name_dict)[:, 0])
     letters = map_values(letters, name_dict)
     return letters
