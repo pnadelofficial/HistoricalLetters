@@ -18,7 +18,7 @@ def load_hierarchy(fname):
     # append title to all of the lords
     lords = ["Dartmouth", "Preston", "Berkeley", "Dover", "Newport", "Pembroke", "Dorset",
              "Thanet", "Supese", "Mulgrave", "Carlisle", "Burlington", "Aylesbury", "Weymouth",
-             "Chandos", "Naughan-Carbury", "Crewe", "Opulstone", "North & Grey"]
+             "Chandos", "Naughan-Carbury", "Crewe", "Opulstone", "North & Grey", "Rochester"]
     for lord in lords:
         name_dict[lord] = "Lord " + lord
     names = map_values(names, name_dict)
@@ -46,6 +46,8 @@ def load_letters(fname):
                      "Wiliam Cornwall": "William Cornwall",
                      "Captain Aylmer": "M. Aylmer",
                      "Lord Alesbury": "Lord Aylesbury",
+                     "Earl of Rochester": "Lord Rochester",
+                     "The Office of the Ordnance": "Samuel Pepys",
                      "Phil. Frowd Esq., then to Pepys": ["Phillip Frowd", "Samuel Pepys"],
                      "King James II, witnessed by Pepys": ["King James II", "Samuel Pepys"]}
         # break up csv in specified columns
@@ -56,6 +58,15 @@ def load_letters(fname):
                     bad_str = letters[i, j]
                     new_str = np.asarray([substr.strip() for substr in bad_str.split(",")])
                     name_dict[bad_str] = list(map_values(new_str[:, np.newaxis], name_dict)[:, 0])
+        # remove unneeded rows
+        del_str = ["His captains", "All sailors", "Unknown"]
+        del_rows = []
+        for i in range(letters.shape[0]):
+            for j in range(letters.shape[1]):
+                if letters[i, j] in del_str:
+                    del_rows.append(i)
+                    break
+        letters = np.delete(letters, del_rows, axis=0)
     letters = map_values(letters, name_dict)
     return letters
 
