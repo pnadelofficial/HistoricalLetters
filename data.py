@@ -5,14 +5,22 @@ def load_hierarchy(fname):
     names = np.loadtxt(fname, delimiter='\t', skiprows=1, dtype=str, usecols=0)
     names = remove_comments(names[np.newaxis])[0]
     name_dict = {"Mr. Samuel Pepys Esq.": "Samuel Pepys",
-                 "Dartmouth": "Lord Dartmouth",
                  "Philip Frowd": "Mr. Frowd",
                  "James II": "King James II",
-                 "Preston": "Lord Preston",
-                 "Berkeley": "Lord Berkeley",
-                 "Dover": "Lord Dover",
                  "Feversham": "Earl of Feversham",
-                 "Berwick": "Duke of Berwick"}
+                 "Berwick": "Duke of Berwick",
+                 "Newcastle": "Duke of Newcastle",
+                 "Captain Cornwall": "William Cornwall",
+                 "Fredrick Frond": "Frederick Frond",
+                 "Henjry Butler": "Henry Butler",
+                 "Captain Aylmer": "M. Aylmer",
+                 "Richars Carter": "Richard Carter"}
+    # append title to all of the lords
+    lords = ["Dartmouth", "Preston", "Berkeley", "Dover", "Newport", "Pembroke", "Dorset",
+             "Thanet", "Supese", "Mulgrave", "Carlisle", "Burlington", "Alesbury", "Weymouth",
+             "Chandos", "Naughan-Carbury", "Crewe", "Opulstone", "North & Grey"]
+    for lord in lords:
+        name_dict[lord] = "Lord " + lord
     names = map_values(names, name_dict)
     ranks = np.loadtxt(fname, delimiter='\t', skiprows=1, dtype=int, usecols=1)
     return dict(zip(names, ranks))
@@ -30,8 +38,24 @@ def load_letters(fname):
         name_dict = {"The Prince of Orange": "Prince of Orange",
                      "John Lord Berkeley, commander of the Montaigne and others": "Lord Berkeley",
                      "Mr. Frowd": "Phillip Frowd",
+                     "The lords at Guild Hall": "Lords of Guild Hall",
+                     "John Ashely": "John Ashley",
+                     "John Pertriburg": "John Petriburg",
+                     "Thman Culpeper": "Thomas Culpeper",
+                     "Captain Cornwall": "William Cornwall",
+                     "Wiliam Cornwall": "William Cornwall",
+                     "Captain Aylmer": "M. Aylmer",
                      "Phil. Frowd Esq., then to Pepys": ["Phillip Frowd", "Samuel Pepys"],
                      "King James II, witnessed by Pepys": ["King James II", "Samuel Pepys"]}
+        # break up csv in specified columns
+        cols = [1, 5]
+        for i in range(letters.shape[0]):
+            for j in cols:
+                if "," in letters[i, j] and letters[i, j] not in name_dict:
+                    bad_str = letters[i, j]
+                    new_str = np.asarray([substr.strip() for substr in bad_str.split(",")])
+                    # TODO test
+                    name_dict[bad_str] = list(map_values(new_str[:, np.newaxis], name_dict)[:, 0])
     letters = map_values(letters, name_dict)
     return letters
 
