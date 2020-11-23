@@ -1,3 +1,5 @@
+import networkx as nx
+
 import data
 import graph
 import plot
@@ -14,7 +16,11 @@ for letter_set in letter_sets:
     if letter_set == "data/BeinekieRecordLetters2.tsv":
         to_from_graphs += [*graph.to_from_dates(letter_array)]
 
-for to_from_graph in to_from_graphs:
+graph_names = ["BeinekieRecordLetters",
+               "BeinekieRecordLetters2",
+               "BeinekieRecordLetters2Before",
+               "BeinekieRecordLetters2After"]
+for i, to_from_graph in enumerate(to_from_graphs):
     for node in to_from_graph.nodes:
         if node not in hierarchy:
             print(node)
@@ -23,3 +29,5 @@ for to_from_graph in to_from_graphs:
             to_from_graph.nodes[node]["rank"] = hierarchy[node]
     print("\n")
     plot.draw_planar(to_from_graph)
+    pd_adj = nx.to_pandas_adjacency(to_from_graph, dtype=int)
+    pd_adj.to_csv("output/%s.csv" % (graph_names[i]))
