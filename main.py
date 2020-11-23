@@ -30,4 +30,4 @@ for i, to_from_graph in enumerate(to_from_graphs):
     print("\n")
     plot.draw_planar(to_from_graph)
     pd_adj = nx.to_pandas_adjacency(to_from_graph, dtype=int)
-    pd_adj.to_csv("output/%s.csv" % (graph_names[i]))
+    pd_adj.to_csv("output/Adj%s.csv" % (graph_names[i]))
