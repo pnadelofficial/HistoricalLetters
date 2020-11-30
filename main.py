@@ -22,6 +22,9 @@ graph_names = ["BeinekieRecordLetters",
                "BeinekieRecordLetters2",
                "BeinekieRecordLetters2Before",
                "BeinekieRecordLetters2After"]
+# data needed for statistics comparisons
+rank_lists = []
+rank_stats = []
 for i, to_from_graph in enumerate(to_from_graphs):
     # add rank node attributes and make rank dictionary
     rank_dict = {}
@@ -43,8 +46,11 @@ for i, to_from_graph in enumerate(to_from_graphs):
     # inputs for statistic functions
     np_adj = pd_adj.to_numpy()
     # get statistics for each rank
-    stats.output_rank(np_adj, rank_dict, graph_names[i])
+    rank_lists += [stats.rank_dict_to_array(rank_dict)[0]]
+    rank_stats += [stats.output_rank(np_adj, rank_dict, graph_names[i])]
     # get statistics for each person
     stats.output_people(np_adj, rank_dict, names, graph_names[i])
     # plot the graph
     plot.draw_planar(to_from_graph)
+
+plot.rank_change(rank_lists, rank_stats)

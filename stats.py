@@ -26,6 +26,8 @@ def output_rank(np_adj, rank_dict, graph_name):
                                  columns=["To " + rank for rank in ranks.astype(str)] +
                                          ["Total Letters Sent"])
     pd_rank_stats.to_csv("output/Rank%s.csv" % (graph_name))
+    # return numpy array without totals
+    return rank_stats[:-1, :-1]
 
 
 def output_people(np_adj, rank_dict, person_names, graph_name):
