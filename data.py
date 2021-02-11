@@ -55,6 +55,8 @@ class EpiDocXMLParser():
         # get one location for every dateline
         for dateline in datelines:
             location = None
+            # remove commas for easier parsing
+            dateline = dateline.replace(",", "")
             # tokenize dateline for easier parsing logic
             tokens = dateline.split(" ")
             i = 0
