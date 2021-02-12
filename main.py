@@ -1,9 +1,9 @@
 import numpy as np
 
-import data
+import epidoc
 
 fname = "canonical-latinLit/data/phi0474/phi056/phi0474.phi056.perseus-lat1.xml"
-parser = data.EpiDocXMLParser(fname)
+parser = epidoc.EpiDocXMLParser(fname)
 dateline_text = parser.dateline_text()
 np.savetxt("output/phi056dateline.csv", dateline_text[:, np.newaxis], fmt='"%s"', delimiter=',')
 
