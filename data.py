@@ -13,6 +13,12 @@ names = [
     "Pompeiano"
 ]
 
+no_modify_locations = [
+    "Sidae",
+    "Menturnis",
+    "Iconium"
+]
+
 names_tokenized = [name.split(' ') for name in names]
 
 
@@ -55,16 +61,25 @@ class EpiDocXMLParser():
         # get one location for every dateline
         for dateline in datelines:
             location = None
-            # remove commas for easier parsing
-            dateline = dateline.replace(",", "")
+            # remove bad characters for easier parsing
+            bad_chars = [",", ";"]
+            for bad_char in bad_chars:
+                dateline = dateline.replace(bad_char, "")
             # tokenize dateline for easier parsing logic
             tokens = dateline.split(" ")
             i = 0
             while i < len(tokens):
                 token = tokens[i]
+                if i < len(tokens) - 1:
+                    next_token = tokens[i + 1]
                 # skip useless tokens
                 if token in ignore_tokens:
                     pass
+                # names not to modify
+                elif token in no_modify_locations:
+                    location = token
+                elif next_token in no_modify_locations:
+                    location = next_token
                 # parse words with uppercase first letter as location
                 elif token[0].isupper():
                     if token == "Patris":
@@ -93,7 +108,6 @@ class EpiDocXMLParser():
                         if location is not None:
                             break
                     if location is None:
-                        next_token = tokens[i + 1]
                         if next_token[0].isupper():
                             if next_token[-1] == "o":
                                 location = next_token[:-1] + "um"
@@ -101,7 +115,6 @@ class EpiDocXMLParser():
                                 location = next_token
                 # parse words after "ad"
                 elif token == "ad":
-                    next_token = tokens[i + 1]
                     if next_token[0].isupper():
                         if next_token[-2:] == "um":
                             location = next_token[:-1] + "s"
