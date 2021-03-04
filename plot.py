@@ -11,7 +11,6 @@ def plot_geodetic(geodetic_coords):
     ax.add_feature(cartopy.feature.LAND)
     ax.add_feature(cartopy.feature.OCEAN)
     ax.add_feature(cartopy.feature.COASTLINE)
-    # ax.add_feature(cartopy.feature.BORDERS, linestyle='-', alpha=.5)
     # plot points
     for geodetic_coord in geodetic_coords:
         plt.plot(geodetic_coord[0], geodetic_coord[1], color='blue', marker='o',
