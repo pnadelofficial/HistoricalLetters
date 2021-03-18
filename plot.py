@@ -4,7 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_geodetic(geodetic_coords):
+def plot_geodetic(location_to_geodetic):
+    # get names and geodetics for plotting
+    locs = np.asarray(list(location_to_geodetic.keys()))
+    geodetic_coords = np.asarray(list(location_to_geodetic.values()))
+    geodetic_coords = geodetic_coords[:, [1, 0]]
     # set up figure and axes
     fig = plt.figure()
     ax = plt.axes(projection=ccrs.PlateCarree())
@@ -28,14 +32,12 @@ def plot_geodetic(geodetic_coords):
     annot.set_visible(False)
 
     # define func to update annotations
-    names = np.array(list("ABCDEFGHIJKLMNO"))
-
     def update_annot(ind):
         # get position from first point
         pos = sc.get_offsets()[ind["ind"][0]]
         annot.xy = pos
         # draw box with annotations from all points from event
-        text = "\n".join([names[n] for n in ind["ind"]])
+        text = "\n".join([locs[n] for n in ind["ind"]])
         annot.set_text(text)
         annot.get_bbox_patch().set_alpha(0.4)
 

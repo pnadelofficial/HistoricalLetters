@@ -18,15 +18,9 @@ np.savetxt("output/phi056locations.csv", np.vstack((locations, dateline_text)).T
 unique_locations = set(locations)
 unique_locations.remove(None)
 sorted_unique_loc = np.sort(np.asarray(list(unique_locations)))
-print(sorted_unique_loc)
 np.savetxt("output/phi056sorted_locs.csv", sorted_unique_loc[:, np.newaxis],
            fmt='"%s"', delimiter=',')
 # get a dictionary mapping known locations to lat/long
-geodetic_fname = "input/phi056sorted_locs.csv"
+geodetic_fname = "input/loc_to_geodetic.csv"
 location_to_geodetic = geodesy.loc_to_geodetic(geodetic_fname)
-print(location_to_geodetic)
-# TODO
-plot.plot_geodetic(np.asarray([[23.73, 37.98],
-                               [20.56, 38.42],
-                               [20.56, 38.42],
-                               [29.06, 37.50]]))
+plot.plot_geodetic(location_to_geodetic)
