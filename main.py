@@ -28,4 +28,5 @@ print(location_to_geodetic)
 # TODO
 plot.plot_geodetic(np.asarray([[23.73, 37.98],
                                [20.56, 38.42],
+                               [20.56, 38.42],
                                [29.06, 37.50]]))
