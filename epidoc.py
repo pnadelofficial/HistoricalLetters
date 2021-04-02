@@ -1,3 +1,5 @@
+import os
+
 from lxml import etree
 import numpy as np
 
@@ -41,22 +43,47 @@ class EpiDocXMLParser():
         }
         # get tags used by methods
         self.datelines = self.edition_div.findall(
-            self.rel_path([
+            self._rel_path([
                 self.sels["books"],
                 self.sels["letters"],
                 self.sels["opener"],
                 self.sels["dateline"],
             ])
         )
+        # store parsing outputs
+        self.dateline_text = self._parse_dateline_text()
+        self.dateline_locs = self._parse_dateline_locs()
+        self.dateline_dates = self._parse_dateline_dates()
+        # store unique locations as a set and sorted array
+        self.unique_locs = set(self.dateline_locs)
+        self.unique_locs.remove(None)
+        self.sorted_unique_locs = np.sort(np.asarray(list(self.unique_locs)))
 
-    def dateline_text(self):
+    def save_csvs(self, label, folder="output"):
+        """Save CSVs with data parsed from document
+
+        Args:
+            label (str): Label to prepend to CSV names
+            folder (str, optional): Folder to save CSVs in. Defaults to "output".
+        """
+        path_stub = os.path.join(folder, label)
+        np.savetxt(path_stub + "dateline.csv", self.dateline_text[:, np.newaxis], fmt='"%s"',
+                   delimiter=',')
+        np.savetxt(path_stub + "locations.csv",
+                   np.vstack((self.dateline_locs, self.dateline_text)).T,
+                   fmt='"%s"', delimiter=',')
+        np.savetxt(path_stub + "sorted_locs.csv", self.sorted_unique_locs[:, np.newaxis],
+                   fmt='"%s"', delimiter=',')
+        return
+
+    def _parse_dateline_text(self):
         return np.asarray(
             [etree.tostring(dateline, encoding=str, method="text").strip()
              for dateline in self.datelines]
         )
 
-    def parse_dateline_locs(self):
-        datelines = self.dateline_text()
+    def _parse_dateline_locs(self):
+        datelines = self.dateline_text
         locations = []
         # get one location for every dateline
         for dateline in datelines:
@@ -132,7 +159,7 @@ class EpiDocXMLParser():
             locations.append(location)
         return np.asarray(locations)
 
-    def parse_dateline_dates(self):
+    def _parse_dateline_dates(self):
         dates = []
         # get one date for every dateline
         for dateline in self.datelines:
@@ -163,7 +190,7 @@ class EpiDocXMLParser():
             dates.append(date)
         return np.asarray(dates)
 
-    def rel_path(self, selectors):
+    def _rel_path(self, selectors):
         """Generates relative path from tag selectors
 
         Args:
