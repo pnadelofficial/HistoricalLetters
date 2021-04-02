@@ -34,6 +34,7 @@ class EpiDocXMLParser():
             raise ValueError("Expected XML file with one edition div")
         self.edition_div = edition_divs[0]
         # define selectors used for different tags
+        # TODO resolve issue with inconsistent capitalization for subtype
         self.sels = {
             "books": "{*}div[@type='textpart'][@subtype='Book']",
             "letters": "{*}div[@type='textpart'][@subtype='letter']",
