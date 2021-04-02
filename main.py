@@ -1,5 +1,5 @@
 import numpy as np
-
+import coordinates
 import epidoc
 import geodesy
 import plot
@@ -26,6 +26,4 @@ geodetic_fname = "input/phi056sorted_locs.csv"
 location_to_geodetic = geodesy.loc_to_geodetic(geodetic_fname)
 print(location_to_geodetic)
 # TODO
-plot.plot_geodetic(np.asarray([[23.73, 37.98],
-                               [20.56, 38.42],
-                               [29.06, 37.50]]))
+plot.plot_geodetic(np.asarray(coordinates.LocList))
