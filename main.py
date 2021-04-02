@@ -10,4 +10,4 @@ parser = epidoc.EpiDocXMLParser(epidoc_fname)
 # get a dictionary mapping known locations to lat/long
 geodetic_fname = "input/loc_to_geodetic.csv"
 location_to_geodetic = geodesy.loc_to_geodetic(geodetic_fname)
-plot.plot_geodetic(location_to_geodetic)
+plot.plot_geodetic(location_to_geodetic, parser)

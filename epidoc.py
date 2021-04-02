@@ -54,10 +54,12 @@ class EpiDocXMLParser():
         self.dateline_text = self._parse_dateline_text()
         self.dateline_locs = self._parse_dateline_locs()
         self.dateline_dates = self._parse_dateline_dates()
-        # store unique locations as a set and sorted array
-        self.unique_locs = set(self.dateline_locs)
-        self.unique_locs.remove(None)
-        self.sorted_unique_locs = np.sort(np.asarray(list(self.unique_locs)))
+        # store unique locations as a sorted array
+        self.sorted_unique_locs, self.unique_loc_counts = np.unique(
+            self.dateline_locs[np.not_equal(self.dateline_locs, None)],
+            return_counts=True
+        )
+        self.loc_to_count = dict(zip(self.sorted_unique_locs, self.unique_loc_counts))
 
     def save_csvs(self, label, folder="output"):
         """Save CSVs with data parsed from document
