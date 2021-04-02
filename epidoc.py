@@ -132,6 +132,37 @@ class EpiDocXMLParser():
             locations.append(location)
         return np.asarray(locations)
 
+    def parse_dateline_dates(self):
+        dates = []
+        # get one date for every dateline
+        for dateline in self.datelines:
+            date = None
+            # get the date from a date tag within the dateline
+            date_tag = dateline.find(self.sels["date"])
+            if date_tag is not None:
+                date = date_tag.attrib.get("when")
+            # get date from parenthesis at end of dateline
+            if date is None:
+                dateline_text = etree.tostring(dateline, encoding=str, method="text").strip()
+                # find string of numbers before a close parenthesis
+                end_ind = dateline_text.rfind(")")
+                start_ind = end_ind - 1
+                while start_ind > 0:
+                    if dateline_text[start_ind].isnumeric():
+                        start_ind -= 1
+                    else:
+                        break
+                start_ind += 1
+                if start_ind < end_ind:
+                    date = "-" + dateline_text[start_ind:end_ind]
+            # convert str to int
+            if date is not None:
+                date = int(date)
+                # convert to AUC
+                date += 754
+            dates.append(date)
+        return np.asarray(dates)
+
     def rel_path(self, selectors):
         """Generates relative path from tag selectors
 

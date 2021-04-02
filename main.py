@@ -5,11 +5,14 @@ import geodesy
 import plot
 
 
+# TODO test with 057-059
 # dateline text from parsing EpiDocXML
 epidoc_fname = "canonical-latinLit/data/phi0474/phi056/phi0474.phi056.perseus-lat1.xml"
 parser = epidoc.EpiDocXMLParser(epidoc_fname)
 dateline_text = parser.dateline_text()
 np.savetxt("output/phi056dateline.csv", dateline_text[:, np.newaxis], fmt='"%s"', delimiter=',')
+# parse the datelines to get the dates
+dateline_dates = parser.parse_dateline_dates()
 # parse the datelines to get the locations
 locations = parser.parse_dateline_locs()
 np.savetxt("output/phi056locations.csv", np.vstack((locations, dateline_text)).T,
