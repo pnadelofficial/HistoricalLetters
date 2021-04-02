@@ -1,3 +1,5 @@
+import os
+
 from lxml import etree
 import numpy as np
 
@@ -32,6 +34,7 @@ class EpiDocXMLParser():
             raise ValueError("Expected XML file with one edition div")
         self.edition_div = edition_divs[0]
         # define selectors used for different tags
+        # TODO resolve issue with inconsistent capitalization for subtype
         self.sels = {
             "books": "{*}div[@type='textpart'][@subtype='Book']",
             "letters": "{*}div[@type='textpart'][@subtype='letter']",
@@ -41,22 +44,49 @@ class EpiDocXMLParser():
         }
         # get tags used by methods
         self.datelines = self.edition_div.findall(
-            self.rel_path([
+            self._rel_path([
                 self.sels["books"],
                 self.sels["letters"],
                 self.sels["opener"],
                 self.sels["dateline"],
             ])
         )
+        # store parsing outputs
+        self.dateline_text = self._parse_dateline_text()
+        self.dateline_locs = self._parse_dateline_locs()
+        self.dateline_dates = self._parse_dateline_dates()
+        # store unique locations as a sorted array
+        self.sorted_unique_locs, self.unique_loc_counts = np.unique(
+            self.dateline_locs[np.not_equal(self.dateline_locs, None)],
+            return_counts=True
+        )
+        self.loc_to_count = dict(zip(self.sorted_unique_locs, self.unique_loc_counts))
 
-    def dateline_text(self):
+    def save_csvs(self, label, folder="output"):
+        """Save CSVs with data parsed from document
+
+        Args:
+            label (str): Label to prepend to CSV names
+            folder (str, optional): Folder to save CSVs in. Defaults to "output".
+        """
+        path_stub = os.path.join(folder, label)
+        np.savetxt(path_stub + "dateline.csv", self.dateline_text[:, np.newaxis], fmt='"%s"',
+                   delimiter=',')
+        np.savetxt(path_stub + "locations.csv",
+                   np.vstack((self.dateline_locs, self.dateline_text)).T,
+                   fmt='"%s"', delimiter=',')
+        np.savetxt(path_stub + "sorted_locs.csv", self.sorted_unique_locs[:, np.newaxis],
+                   fmt='"%s"', delimiter=',')
+        return
+
+    def _parse_dateline_text(self):
         return np.asarray(
             [etree.tostring(dateline, encoding=str, method="text").strip()
              for dateline in self.datelines]
         )
 
-    def parse_dateline_locs(self):
-        datelines = self.dateline_text()
+    def _parse_dateline_locs(self):
+        datelines = self.dateline_text
         locations = []
         # get one location for every dateline
         for dateline in datelines:
@@ -132,7 +162,38 @@ class EpiDocXMLParser():
             locations.append(location)
         return np.asarray(locations)
 
-    def rel_path(self, selectors):
+    def _parse_dateline_dates(self):
+        dates = []
+        # get one date for every dateline
+        for dateline in self.datelines:
+            date = None
+            # get the date from a date tag within the dateline
+            date_tag = dateline.find(self.sels["date"])
+            if date_tag is not None:
+                date = date_tag.attrib.get("when")
+            # get date from parenthesis at end of dateline
+            if date is None:
+                dateline_text = etree.tostring(dateline, encoding=str, method="text").strip()
+                # find string of numbers before a close parenthesis
+                end_ind = dateline_text.rfind(")")
+                start_ind = end_ind - 1
+                while start_ind > 0:
+                    if dateline_text[start_ind].isnumeric():
+                        start_ind -= 1
+                    else:
+                        break
+                start_ind += 1
+                if start_ind < end_ind:
+                    date = "-" + dateline_text[start_ind:end_ind]
+            # convert str to int
+            if date is not None:
+                date = int(date)
+                # convert to AUC
+                date += 754
+            dates.append(date)
+        return np.asarray(dates)
+
+    def _rel_path(self, selectors):
         """Generates relative path from tag selectors
 
         Args:
