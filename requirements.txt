@@ -1,4 +1,0 @@
-networkx==2.3
-numpy
-pandas
-matplotlib
