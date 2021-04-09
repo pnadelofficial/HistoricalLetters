@@ -4,17 +4,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_geodetic(location_to_geodetic, edxml_parser):
+def plot_geodetic(location_to_geodetic, sorted_unique_locs, loc_to_count):
     # get names and geodetics for plotting
     locs = np.asarray(list(location_to_geodetic.keys()))
     geodetic_coords = np.asarray(list(location_to_geodetic.values()))
     geodetic_coords = geodetic_coords[:, [1, 0]]
     # remove any locations from geodetic that was not in parser
-    loc_in_parser = np.isin(locs, edxml_parser.sorted_unique_locs)
+    loc_in_parser = np.isin(locs, sorted_unique_locs)
     locs = locs[loc_in_parser]
     geodetic_coords = geodetic_coords[loc_in_parser]
     # count occurences of each location in parser
-    loc_counts = np.asarray([edxml_parser.loc_to_count[loc] for loc in locs])
+    loc_counts = np.asarray([loc_to_count[loc] for loc in locs])
     # set up figure and axes
     fig = plt.figure()
     ax = plt.axes(projection=ccrs.PlateCarree())
