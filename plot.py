@@ -1,5 +1,6 @@
 import cartopy
 import cartopy.crs as ccrs
+from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -85,14 +86,37 @@ def plot_geodetic_anim(loc_to_geodetic, parser):
     geodetic_coords = np.asarray(list(loc_to_geodetic.values()))
     geodetic_coords = geodetic_coords[:, [1, 0]]
     min_coord, max_coord = geodetic_crop(geodetic_coords)
-    # plot year by year
-    for date in parser.unique_dates:
+    # set up figure and axes
+    fig = plt.figure()
+    ax = plt.axes(projection=ccrs.PlateCarree())
+    # zoom view around points
+    ax.set_extent([min_coord[0], max_coord[0], min_coord[1], max_coord[1]],
+                  crs=ccrs.PlateCarree())
+    # add imagery
+    ax.add_feature(cartopy.feature.LAND)
+    ax.add_feature(cartopy.feature.OCEAN)
+    sc = plt.scatter([], [], color='#00000088', marker='o')
+
+    def update_plot(date):
+        # filter locations by date
         locations = parser.dateline_locs[parser.dateline_dates == date]
         sorted_unique_locs, unique_loc_counts = parser.unique(
             locations, return_counts=True
         )
         loc_to_count = dict(zip(sorted_unique_locs, unique_loc_counts))
-        plot_geodetic(loc_to_geodetic, sorted_unique_locs, loc_to_count,
-                      min_coord, max_coord)
+        # get names and geodetics for plotting
+        locs = np.asarray(list(loc_to_geodetic.keys()))
+        # remove any locations from geodetic that was not in parser
+        loc_in_parser = np.isin(locs, sorted_unique_locs)
+        locs = locs[loc_in_parser]
+        parsed_geodetic_coords = geodetic_coords[loc_in_parser]
+        # count occurences of each location in parser
+        loc_counts = np.asarray([loc_to_count[loc] for loc in locs])
+        # update the plot
+        sc.set_offsets(parsed_geodetic_coords)
+        sc.set_sizes(2*loc_counts)
         plt.title(date)
-        plt.show()
+        return sc,
+    # don't remove reference to animation before it is shown!
+    ani = FuncAnimation(fig, update_plot, frames=parser.unique_dates)
+    plt.show()

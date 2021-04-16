@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 import epidoc
 import geodesy
 import plot
@@ -13,4 +11,3 @@ parser = epidoc.EpiDocXMLParser(epidoc_fname)
 geodetic_fname = "input/loc_to_geodetic.csv"
 loc_to_geodetic = geodesy.loc_to_geodetic(geodetic_fname)
 plot.plot_geodetic_anim(loc_to_geodetic, parser)
-plt.show()
